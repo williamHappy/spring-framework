@@ -170,6 +170,7 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
 	static {
 		// Eagerly load the ContextClosedEvent class to avoid weird classloader issues
 		// on application shutdown in WebLogic 8.1. (Reported by Dustin Woods.)
+		// 优先加载上下文关闭事件来防止奇怪的类加载问题再应用程序关闭的时候
 		ContextClosedEvent.class.getName();
 	}
 
@@ -178,6 +179,7 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
 	protected final Log logger = LogFactory.getLog(getClass());
 
 	/** Unique id for this context, if any. */
+	// 创建上下文的唯一标识
 	private String id = ObjectUtils.identityToString(this);
 
 	/** Display name. */
@@ -244,6 +246,7 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
 	 * Create a new AbstractApplicationContext with no parent.
 	 */
 	public AbstractApplicationContext() {
+		// 创建资源模式处理器 资源文件、xml
 		this.resourcePatternResolver = getResourcePatternResolver();
 	}
 
@@ -484,6 +487,7 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
 	 * @see org.springframework.core.io.support.PathMatchingResourcePatternResolver
 	 */
 	protected ResourcePatternResolver getResourcePatternResolver() {
+		// 创建一个资源模式解析器（其实就是用来解析xml配置文件）
 		return new PathMatchingResourcePatternResolver(this);
 	}
 
@@ -543,6 +547,7 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
 
 	@Override
 	public void refresh() throws BeansException, IllegalStateException {
+		// 加锁，保证刷新和销毁 都是一个完整的过程
 		synchronized (this.startupShutdownMonitor) {
 			StartupStep contextRefresh = this.applicationStartup.start("spring.context.refresh");
 
@@ -552,7 +557,7 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
 			 * 2. 设置活跃状态为true
 			 * 3. 设置关闭状态为false
 			 * 4. 获取Environment对象，并加载当前系统的属性值到Environment对象中
-			 * 5. 准备监听器和时间的集合对象，默认为空的集合
+			 * 5. 准备监听器和事件的集合对象，默认为空的集合
 			 */
 			// Prepare this context for refreshing.
 			prepareRefresh();
